@@ -83,6 +83,10 @@ define('CONSH_VERSION', 0.2);
  */
 define('C5_EXECUTE', true);
 
+set_include_path(CONSH_DIR . "/includes/phpseclib");
+include("Net/SSH2.php");
+include("Crypt/RSA.php");
+include("Net/SFTP.php");
 
 require 'functions.php';
 require 'cli_colors.php';
@@ -118,3 +122,10 @@ if (!empty($pkg)) {
 require C5_DIR.'/config/site.php';
 require 'local_db.php';
 require 'ssh.php';
+
+ if (function_exists("ssh2_connect")) {
+    define("SSH","SSH");
+} else {
+    require 'ssh_sec_lib.php';
+    define("SSH","SSHSecLib");
+}

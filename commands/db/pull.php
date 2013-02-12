@@ -10,7 +10,9 @@
  */
 class DbPull extends Command
 {
-
+	
+	private $ssh;
+	    
     /**
      * sets the name, description, and help
      *
@@ -21,6 +23,7 @@ class DbPull extends Command
         $this->name = "DB:Pull";
         $this->description = "Pull remote database";
         $this->help = "Pull and import the remote database to the local setup";
+        $this->ssh = SSH;
     }
 
     /**
@@ -41,7 +44,7 @@ class DbPull extends Command
     public function run($options = array())
     {
         Hook::fire('before_db_pull');
-        $ssh = new SSH();
+        $ssh = new $this->ssh;
         output("Pulling remote database");
         $file_name = 'db_' . time() . '.sql';
         $remote_file = REMOTE_HOME_PATH.$file_name;

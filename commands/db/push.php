@@ -5,12 +5,14 @@
  */
 class DbPush extends Command
 {
-
+	private $ssh;
+	
     public function __construct()
     {
         $this->name = "DB:Push";
         $this->description = "Push local database";
         $this->help = "Push and import the local database to the remote server";
+        $this->ssh = SSH;
     }
 
     public function run($options = array())
@@ -21,7 +23,7 @@ class DbPush extends Command
             return false;
         }
         die("not yet implemented");
-        $ssh = new SSH();
+        $ssh = new $this->ssh;
         debug("Pulling remote database");
         $file_name = 'db_' . time() . '.sql';
         $remote_file = REMOTE_HOME_PATH.$file_name;
