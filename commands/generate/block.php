@@ -30,7 +30,11 @@ class GenerateBlock extends Command
         parent::__construct();
         $this->name = "Generate:Block";
         $this->description = "Generates a skeleton block";
-        $this->help = "Generate a simple block";
+        $this->help = "Generate a simple block from the passed in parameters";
+        $this->parameters = array(
+            'name' => 'The name of the block to create. Example: my_new_block',
+            'fields' => 'The rest of the paramaters are the fields in the form of field_name:type. Current field types are id, text, textarea, wysiwyg, page, image, file'
+        );
     }
 
     /**
@@ -63,10 +67,24 @@ class GenerateBlock extends Command
         $block_name = ucwords(str_replace("_", ' ', $name));
 
         $controller_path = $path . "/controller.php";
+        $wysiwyg_path = $path . "/wysiwyg.php";
         $db_xml_path = $path . "/db.xml";
         $form_path = $path. "/_form.php";
 
         $controller_str = file_get_contents($controller_path);
+
+        // if we are dealing with a wysiwyg, inject the necessary stuff to the controller to handle saving
+        $wysiwyg_field_name = $this->hasWysiwyg($fields);
+        $wysiwyg_contents = '';
+        if ($wysiwyg_field_name != false) {
+            $wysiwyg_contents = file_get_contents($wysiwyg_path);
+            $wysiwyg_contents = str_replace("{{wysiwyg_field}}", $wysiwyg_field_name, $wysiwyg_contents);
+        }
+        $controller_str = str_replace("{{WysiwygContent}}", $wysiwyg_contents, $controller_str);
+        unlink($wysiwyg_path);  //cleanup folder
+
+        $controller_str = str_replace("{{ExtraControllerMethods}}", "", $controller_str);
+
         $controller_str = str_replace(array("{{ControllerName}}", "{{TableName}}", "{{BlockName}}"), array($controller_name, $table_name, $block_name), $controller_str);
         $controller_handle = fopen($controller_path, "w+");
         fwrite($controller_handle, $controller_str);
@@ -161,5 +179,17 @@ class GenerateBlock extends Command
         $field_label = ucwords(str_replace("_", ' ', $field_name));
         $template = file_get_contents($template_path);
         return str_replace(array('{field_name}', '{field_title}'), array($field_name, $field_label), $template);
+    }
+
+    protected function hasWysiwyg($fields)
+    {
+        foreach($fields as $field) {
+            $data = explode(":", $field);
+            $field_type = $data[1];
+            if ($field_type == 'wysiwyg' || $field_type == 'editor') {
+                return $data[0];
+            }
+        }
+        return false;
     }
 }

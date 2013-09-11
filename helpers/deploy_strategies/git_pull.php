@@ -19,7 +19,7 @@ class GitPullDeployStrategy implements DeployStrategy
     public function deploy()
     {
         $ssh = new $this->ssh;
-        output("pulling origin/master on remote server");
+        output("pulling " . DEPLOY_REMOTE . "/" . DEPLOY_BRANCH . " on remote server");
         $ssh->runCommand('cd ' . REMOTE_DOC_ROOT);
         $console_output = $ssh->runCommand('cd '.REMOTE_DOC_ROOT . ' && git pull ' . DEPLOY_REMOTE . ' ' . DEPLOY_BRANCH);
         output($console_output);

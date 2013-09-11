@@ -13,6 +13,10 @@ general syntax is similiar to rake tasks.
 
 ```consh files:pull```
 
+```consh backup:db MyBackup```
+
+```consh restore:remote:db 1362710294-MyBackup.sql```
+
 Commands can be added in to the commands folder and must extend the base command object. When a user runs ```consh fun:task```
 the method ```FunTask->run()``` will be called. FunTask should be defined in ```commands/fun/task.php```
 
@@ -34,18 +38,29 @@ Tasks
 
 The current list of tasks avilable are:
 ```
-Version                 Displays the consh version
-Files:Pull              Pull remote files locally
-DB:Push                 Push local database
-DB:Pull                 Pull remote database
-Generate:Block          Generate a block in the /blocks directory with the passed in attributes
-Generate:Block:Template Copy the default block template to the passed in template name
-Generate:Table          Generates a db.xml file for the passed in attributes
-Generate:Theme          Copy theme files from the skeletons/theme/ directory
-Generate:Model          Generates a skeleton model
-Pull                    Pull a remote database and files
-Config                  Create a configuration file
-Deploy                  Perform a git pull on the remote server
+Current Commands:
+Backup:DB                   Backup the remote database locally
+Config                      Create a configuration file
+DB:Connect                  Connect to the local db
+DB:Pull                     Pull remote database
+DB:Push                     Push local database
+Deploy                      Deploy the code from origin master to the remote server
+Files:Pull                  Pull remote files locally
+Generate:Block              Generates a skeleton block
+Generate:Block:Override     Copies the controller for a core block
+Generate:Block:Template     Generates a template for an existing block
+Generate:Model              Generates a skeleton model
+Generate:Pagetype           Generates a pagetype controller
+Generate:Table              Generates a db.xml file for the passed in attributes
+Generate:Theme              Generates a skeleton theme
+Git:Pull                    Pull remote repo locally
+Git:Push                    Push local git repo to remote
+Help                        Display help about a command
+Pull                        Pull a remote database and files
+Push                        Push local git repo to remote and then deploy
+Restore:DB                  Restore a db backup to the local server
+Restore:Remote:DB           Restore a db backup to the remote server
+Version                     Displays the consh version
 ```
 
 Hooks
@@ -92,3 +107,85 @@ consh Generate:Block my_block_name bID:id title:string body:text page_id:page im
 ```
 
 to create a block in the folder /blocks/my_block_name. The block will be named 'My Block Name' and have an add / edit interface for the passed in fields
+
+
+Configuration Options
+=====================
+
+There are a number of required and optional configuration values which can be used to customize how consh interacts with the remote site.
+
+## SSH / Host connection Information
+
+### REMOTE_HOST
+
+The remote host that the site runs on
+
+### REMOTE_USER
+
+The username on the remote system to ssh in as
+
+### REMOTE_HOME_PATH
+
+The full path to the home folder of the website
+
+### REMOTE_DOC_ROOT
+
+Where the document root is on the remote server
+
+### REMOTE_PASS
+
+Currently this is not used as only ssh-key based authentication is used
+
+### REMOTE_USE_KEY
+
+Currently not used and is always true
+
+### REMOTE_PUB_KEY_PATH
+
+This should point to your ~/.ssh/id_rsa.pub file path
+
+### REMOTE_PRIV_KEY_PATH
+
+This should point to your ~/.ssh/id_rsa file
+
+### REMOTE_PORT
+
+If you are running ssh on a port besides 22 you will want to update this
+
+## Remote Database Connection Details
+
+### REMOTE_DB_HOST
+
+The host the remote website uses to connect to the database (usually localhost)
+
+### REMOTE_DB_USER
+
+The username the remote website uses to connect to the database
+
+### REMOTE_DB_PASS
+
+The password the remote website uses to connect to the database
+
+### REMOTE_DB_NAME
+
+The database name the remote website uses
+
+## Git / Deployment information
+
+### DEPLOY_BRANCH
+
+Which branch to use when deploying (use master if you're not sure)
+
+### DEPLOY_REMOTE
+
+Which remote to use when deploying (use origin if you're not sure)
+
+### DEPLOY_STRATEGY
+
+Currently only ```git_pull``` is supported. Future plans for a strategy more similar to capistrano's multiple versions, etc are in place.
+
+## Others
+
+### LOCAL_BACKUP_DIR
+
+Where to store the contents of the ```consh backup:db``` command
